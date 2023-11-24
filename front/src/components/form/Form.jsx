@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import validation from "../../utils/validation.js";
 
-const Form = (login) => {
+const Form = ({ login }) => {
   const [userData, setUserData] = useState({
     email: "",
     password: "",
@@ -14,32 +14,33 @@ const Form = (login) => {
       [event.target.name]: event.target.value,
     });
     //validation va retornar un objeto y ese retorno se tiene q guardar en el estado errors
-    setErrors(
-      validation({
-        ...userData,
-        [event.target.name]: event.target.value,
-      })
-    );
   };
 
   const handleSubmit = (event) => {
-    event.preventDefault(); //prevendefault si no esta desaparece la informacion y se recarga la pagina
+    event.preventDefault(); //prevenDefault evitamos que se recarue la pagina
     login(userData);
   };
 
+  useEffect(() => {
+    if (userData.email !== "" || userData.password !== "") {
+      setErrors(validation(userData));
+    }
+  }, [userData]);
+
   return (
     <form onSubmit={handleSubmit}>
-      <label htmlFor="email">Email: </label>
+      <label>Email: </label>
       <input
+        type="email"
         name="email"
         placeholder="ingrese su email"
         value={userData.email}
         onChange={handleChange}
       />
-      {errors.email && <p>{errors.email}</p>}
+      <p>{errors.email}</p>
       <hr />
 
-      <label htmlFor="text">Password: </label>
+      <label>Password: </label>
       <input
         name="password"
         type="password"
@@ -47,10 +48,11 @@ const Form = (login) => {
         value={userData.password}
         onChange={handleChange}
       />
-      {errors.password && <p>{errors.password}</p>}
+      <p>{errors.password}</p>
 
       <button
         type="submit"
+
         //disabled={!userData.email || !userData.password || errors.email}
       >
         Enviar

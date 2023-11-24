@@ -1,16 +1,25 @@
+/*STYLE */
 import "./App.css";
+
+/*COMPONENTS TO RENDER */
 import Cards from "./components/cards/Cards.jsx";
 import Nav from "./components/nav/Nav.jsx";
 import About from "./components/about/About";
-import Detail from "./components/detail/Detail";
-import { useState, useEffect } from "react";
-import axios from "axios";
-import { Routes, Route, useLocation } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 import Form from "./components/form/Form";
+import Favorites from "./components/favorites/Favorites";
+import Detail from "./components/detail/Detail";
 
-const EMAIL = "cintia.poloni@gmail.com";
-const PASSWORD = "hola12";
+/*HOOKS */
+import { useState, useEffect } from "react";
+import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
+
+/*DEPENDENCIES */
+import axios from "axios";
+
+/*CREDENTIALS */
+const EMAIL = "hola@gmail.com";
+const PASSWORD = "hola123";
+const APIKEY = "pi-cpoloni";
 
 const App = () => {
   const [characters, setCharacters] = useState([]); //[estadolocal, func p/ modificar estado local]
@@ -19,15 +28,21 @@ const App = () => {
   // } los "..." es un express operator, hago una copia del arreglo que tengo para no psarlo y le concateno el nuevo elemento
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const APIKEY = "pi-cpoloni";
   const [access, setAccess] = useState(false);
 
   const login = (userData) => {
     if (userData.email === EMAIL && userData.password === PASSWORD) {
       setAccess(true);
       navigate("/home");
+    } else {
+      window.alert("Email o password incorrecto");
     }
   };
+
+  function logout() {
+    setAccess(false);
+    navigate("/");
+  }
 
   useEffect(() => {
     !access && navigate("/");
@@ -36,6 +51,7 @@ const App = () => {
 
   //ponerle condicional para q no repita tarjeta
   const onSearch = (id) => {
+    // LA ENCARGADA DE HACER LA PETICION A LA API
     if (characters.some((character) => character.id === Number(id))) {
       window.alert("El personaje ya ha sido agregado");
     } else {
@@ -51,17 +67,15 @@ const App = () => {
     }
   };
 
-  const onClose = (id) => {
-    const charactersFiltered = characters.filter(
-      (character) => character.id !== Number(id)
+  function onClose(id) {
+    setCharacters(
+      characters.filter((character) => character.id !== Number(id))
     );
-    setCharacters(charactersFiltered);
-  };
-
+  }
   return (
     //NAV recibe por props la funcion onsearch y se la pasa a Search bar (hacia abajo) search bar realiza el evento onclick y sube hacia arriba buscando quien tiene la ejecucion de la funcion onSearch
     <div className="App">
-      {pathname !== "/" ? <Nav onSearch={onSearch} /> : null}
+      {pathname !== "/" && <Nav onSearch={onSearch} logout={logout} />}
       <Routes>
         <Route path="/" element={<Form login={login} />} />
         <Route
@@ -69,6 +83,7 @@ const App = () => {
           element={<Cards characters={characters} onClose={onClose} />}
         />
         <Route path="/about" element={<About />} />
+        <Route path="/favorites" element={<Favorites />} />
         <Route path="/detail/:id" element={<Detail />} />
       </Routes>
     </div>

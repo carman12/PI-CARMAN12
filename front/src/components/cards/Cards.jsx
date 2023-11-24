@@ -1,6 +1,6 @@
 import Card from "../card/Card";
 
-export default function Cards({ characters, onClose }) {
+const Cards = ({ characters, onClose }) => {
   return (
     <div>
       {characters.map(
@@ -22,4 +22,5 @@ export default function Cards({ characters, onClose }) {
       )}
     </div>
   );
-}
+};
+export default Cards;
