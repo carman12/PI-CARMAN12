@@ -19,7 +19,6 @@ import axios from "axios";
 /*CREDENTIALS */
 const EMAIL = "hola@gmail.com";
 const PASSWORD = "hola123";
-const APIKEY = "pi-cpoloni";
 
 const App = () => {
   const [characters, setCharacters] = useState([]); //[estadolocal, func p/ modificar estado local]
@@ -55,15 +54,15 @@ const App = () => {
     if (characters.some((character) => character.id === Number(id))) {
       window.alert("El personaje ya ha sido agregado");
     } else {
-      axios(
-        `https://rym2.up.railway.app/api/character/${id}?key=${APIKEY}`
-      ).then(({ data }) => {
-        if (data.name) {
-          setCharacters((oldChars) => [...oldChars, data]);
-        } else {
-          window.alert("¡No hay personajes con este ID!");
+      axios(`http://localhost:3001/rickandmorty/character/${id}`).then(
+        ({ data }) => {
+          if (data.name) {
+            setCharacters((oldChars) => [...oldChars, data]);
+          } else {
+            window.alert("¡No hay personajes con este ID!");
+          }
         }
-      });
+      );
     }
   };
 
