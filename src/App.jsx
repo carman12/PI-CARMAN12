@@ -33,7 +33,7 @@ function logout (){
 
   function onSearch(id) {
     axios(
-      `https://rym2.up.railway.app/api/character/${id}?key=${APY_KEY}`
+      `http://localhost:3001/rickandmorty/character/${id}`
     ).then(({ data }) => {
       if (data.name) {
         const isCharacterDuplicate = char.some((char) => char.id === data.id);

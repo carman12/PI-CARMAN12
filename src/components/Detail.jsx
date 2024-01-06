@@ -8,7 +8,7 @@ const Detail = () => {
   const [character, setCharacter] = useState({});
   useEffect(() => {
     axios(
-      `https://rym2.up.railway.app/api/character/${id}?key=${APY_KEY}`
+      `"http://localhost:3001/rickandmorty/character/${id}"`
     ).then(({ data }) => {
       if (data.name) {
         setCharacter(data);
