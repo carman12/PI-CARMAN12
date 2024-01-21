@@ -3,12 +3,17 @@ import Cards from "../cards/Cards";
 import { orderCards, filterCards } from "../../redux/actions";
 import { useState } from "react";
 
+// Asumiendo que la parte específica que necesitas es "myFavorites"
+//const selectFavorites = (state) => state.myFavorites; 
+
 const Favorites = () => {
   const [aux, setAux] = useState(false);
 
   const dispatch = useDispatch();
 
   const { myFavorites } = useSelector((state) => state);
+  // Utiliza el selector modificado
+  //const myFavorites = useSelector(selectFavorites);
 
   const handleChange = (event) => {
     if (event.target.name === "order") {

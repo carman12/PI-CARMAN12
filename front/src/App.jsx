@@ -1,93 +1,115 @@
-/*STYLE */
 import "./App.css";
-
-/*COMPONENTS TO RENDER */
 import Cards from "./components/cards/Cards.jsx";
 import Nav from "./components/nav/Nav.jsx";
-import About from "./components/about/About";
-import Form from "./components/form/Form";
-import Favorites from "./components/favorites/Favorites";
-import Detail from "./components/detail/Detail";
-
+import About from "./components/about/About.jsx";
+import Detail from "./components/detail/Detail.jsx";
+import Error404 from "./components/Error/Error.jsx";
+import Form from "./components/form/Form.jsx";
+import Favorites from "./components/favorites/Favorites.jsx";
+import SearchBar from "./components/searchbar/SearchBar.jsx";
 /*HOOKS */
-import { useState, useEffect } from "react";
-import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { useState, useEffect, useMemo } from "react";
+import { Routes, Route, useNavigate } from "react-router-dom";
 
 /*DEPENDENCIES */
 import axios from "axios";
 
 /*CREDENTIALS */
-const EMAIL = "hola@gmail.com";
-const PASSWORD = "hola123";
+const APY_KEY = "pi-carman12";
 
 const App = () => {
-  const [characters, setCharacters] = useState([]); //[estadolocal, func p/ modificar estado local]
-  // function onSearch(id) {
-  //   setCharacter([...character, example]);
-  // } los "..." es un express operator, hago una copia del arreglo que tengo para no psarlo y le concateno el nuevo elemento
-  const { pathname } = useLocation();
   const navigate = useNavigate();
+  const [char, setChar] = useState([]);
   const [access, setAccess] = useState(false);
+  const EMAIL = "mail@mail.com";
+  const PASSWORD = "hola123";
 
-  const login = (userData) => {
-    if (userData.email === EMAIL && userData.password === PASSWORD) {
-      setAccess(true);
-      navigate("/home");
-    } else {
-      window.alert("Email o password incorrecto");
+  async function login(userData) {
+    try{
+    const { email, password } = userData;
+    const URL = "http://localhost:3001/rickandmorty/login/";
+    const response = await axios.get(`${URL}?email=${email}&password=${password}`);
+    if(response.data.email === EMAIL && response.data.password === PASSWORD){
+    const { access } = response.data;
+    setAccess(response.data);
     }
-  };
 
+    if (access) {
+      navigate("/home");
+    }
+  } catch (error) {
+    console.error("Error during login:", error.message);
+    // Manejar el error según tus necesidades
+  }
+  }
   function logout() {
     setAccess(false);
     navigate("/");
   }
-
-  useEffect(() => {
-    !access && navigate("/");
-  }, [access]);
   //el use efect siempre tiene q ir con su array de dependencias []
 
   //ponerle condicional para q no repita tarjeta
-  const onSearch = (id) => {
-    // LA ENCARGADA DE HACER LA PETICION A LA API
-    if (characters.some((character) => character.id === Number(id))) {
-      window.alert("El personaje ya ha sido agregado");
-    } else {
-      axios(`http://localhost:3001/rickandmorty/character/${id}`).then(
-        ({ data }) => {
-          if (data.name) {
-            setCharacters((oldChars) => [...oldChars, data]);
-          } else {
-            window.alert("¡No hay personajes con este ID!");
-          }
+  async function onSearch(id) {
+    try {
+      // Utilizamos la API para consultar
+      const response = await axios.get(`http://localhost:3001/rickandmorty/character/${id}`);
+      const data = response.data;
+  
+      if (data.name) {
+        const isCharacterDuplicate = char.some((character) => character.id === data.id);
+  
+        if (!isCharacterDuplicate) {
+          setChar((oldChars) => [...oldChars, data]);
+        } else {
+          window.alert("Este personaje ya ha sido agregado a la lista.");
         }
-      );
+      } else {
+        window.alert("¡No hay personajes con este ID!");
+      }
+    } catch (error) {
+      console.error("Error during onSearch:", error.message);
+      // Manejar el error
+      window.alert("Hubo un error al buscar el personaje. Por favor, inténtalo de nuevo.");
     }
-  };
-
-  function onClose(id) {
-    setCharacters(
-      characters.filter((character) => character.id !== Number(id))
-    );
   }
+
+  const onClose = (id) => {
+    const updatedCharList = char.filter((character) => character.id !== id);
+    // Actualizamos el estado de char con la nueva lista
+    setChar(updatedCharList);
+  };
+  // useEffect(() => {
+  //   // Verifica la condición de acceso y navega en consecuencia
+  //   if (!access) {
+  //     navigate("/");
+  //   }
+  // }, [access, navigate]);
+  
+ useMemo(() => {
+  !access && navigate("/");
+ }, [access]);
+
   return (
     //NAV recibe por props la funcion onsearch y se la pasa a Search bar (hacia abajo) search bar realiza el evento onclick y sube hacia arriba buscando quien tiene la ejecucion de la funcion onSearch
     <div className="App">
-      {pathname !== "/" && <Nav onSearch={onSearch} logout={logout} />}
+      {location.pathname !== "/" && <Nav onSearch={onSearch} logout={logout} />}
       <Routes>
         <Route path="/" element={<Form login={login} />} />
+        <Route path="/favorites" element={<Favorites />} />
         <Route
           path="/home"
-          element={<Cards characters={characters} onClose={onClose} />}
+          element={
+            <div className="App">
+              <Cards characters={char} onClose={onClose} />
+            </div>
+          }
         />
         <Route path="/about" element={<About />} />
-        <Route path="/favorites" element={<Favorites />} />
         <Route path="/detail/:id" element={<Detail />} />
+        <Route path="*" element={<Error404 />} />
       </Routes>
     </div>
   );
 };
-// por q  no me muestra el navbar si yo pongo === /
 
 export default App;

@@ -1,7 +1,7 @@
 const About = () => {
   return (
     <div>
-      <h1> creado por Cintia Poloni </h1>
+      <h1> This it´s ABOUT </h1>
     </div>
   );
 };

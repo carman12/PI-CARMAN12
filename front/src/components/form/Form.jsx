@@ -1,63 +1,127 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import validation from "../../utils/validation.js";
+import styles from "./Form.module.css";
+import ojoAbierto from "./Utilidades.css?inline";
 
 const Form = ({ login }) => {
   const [userData, setUserData] = useState({
     email: "",
     password: "",
   });
-  const [errors, setErrors] = useState({});
+
+  const emailInputRef = useRef(null);
+  const passwordInputRef = useRef(null);
+
+  const [error, setError] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (event) => {
-    setUserData({
-      ...userData,
-      [event.target.name]: event.target.value,
-    });
-    //validation va retornar un objeto y ese retorno se tiene q guardar en el estado errors
+    const { name, value } = event.target;
+
+    setUserData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+
+    setError(
+      validation({
+        ...userData,
+        [name]: value,
+      })
+    );
+
+    // Ajustar el ancho del input basado en el tamaño del texto ingresado
+    if (name === "email" && emailInputRef.current) {
+      emailInputRef.current.style.width =
+        value === "" ? "auto" : `${emailInputRef.current.scrollWidth}px`;
+    } else if (name === "password" && passwordInputRef.current) {
+      passwordInputRef.current.style.width =
+        value === "" ? "auto" : `${passwordInputRef.current.scrollWidth}px`;
+    }
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   const handleSubmit = (event) => {
-    event.preventDefault(); //prevenDefault evitamos que se recarue la pagina
+    event.preventDefault();
     login(userData);
   };
 
-  useEffect(() => {
-    if (userData.email !== "" || userData.password !== "") {
-      setErrors(validation(userData));
-    }
-  }, [userData]);
-
   return (
-    <form onSubmit={handleSubmit}>
-      <label>Email: </label>
-      <input
-        type="email"
-        name="email"
-        placeholder="ingrese su email"
-        value={userData.email}
-        onChange={handleChange}
-      />
-      <p>{errors.email}</p>
-      <hr />
-
-      <label>Password: </label>
-      <input
-        name="password"
-        type="password"
-        placeholder="ingrese una password"
-        value={userData.password}
-        onChange={handleChange}
-      />
-      <p>{errors.password}</p>
-
-      <button
-        type="submit"
-
-        //disabled={!userData.email || !userData.password || errors.email}
+    <div>
+      <div id={styles.rickAndMortyContainer}>
+        <div id={styles.rickAndMortyText}>Rick y Morty</div>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
       >
-        Enviar
-      </button>
-    </form>
+        <form>
+          <div>
+            <label>CORREO ELECTRONICO: </label>
+            <input
+              ref={emailInputRef}
+              type="email"
+              name="email"
+              value={userData.email}
+              placeholder="Ingrese su correo electronico"
+              onChange={handleChange}
+            />
+            <p>{error.email}</p>
+          </div>
+          <div>
+            <div style={{ position: "relative" }}>
+              <label>CONTRASEÑA: </label>
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={userData.password}
+                placeholder="Ingrese su contraseña"
+                onChange={handleChange}
+              />
+              <button
+                type="button"
+                onClick={togglePasswordVisibility}
+                style={{
+                  position: "absolute",
+                  right: "10.2%",
+                  top: "70%",
+                  transform: "translateY(-50%)",
+                  cursor: "pointer",
+                  border: "none",
+                  background: "transparent",
+                }}
+              >
+                {showPassword ? (
+                  "👁️"
+                ) : (
+                  <img
+                    src={ojoAbierto}
+                    //alt="Mostrar/ocultar contraseña"
+                    style={{ height: "20px" }}
+                  />
+                )}
+              </button>
+            </div>
+            <p>{error.password}</p>
+          </div>
+          <div>
+            <button
+              type="submit"
+              /*disabled={Object.values(error).some((errors) => errors)}*/
+              onClick={handleSubmit}
+            >
+              Enviar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 };
 export default Form;
