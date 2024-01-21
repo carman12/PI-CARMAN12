@@ -1,27 +1,29 @@
-const http = require("http");
-const getCharById = require("./controllers/getCharById");
+
+const express = require('express');
+const server = express();
 const PORT = 3001;
+const mainRouter = require('./routes/index');
 
-//data lo estoy pidiendo de la carpeta
+server.listen(PORT, () => {
+   console.log('Server raised in port: ' + PORT);
+});
 
-http
-  .createServer((req, res) => {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    //esta linea le da permiso al front end para q haga peticiones, despues d ela coma le pones a quien le das acceso, si es * todos, si es localhost:3000 solo a mi front
-    //if (req.url.includes("/rickandmorty/character")) {
-    //const id = req.url.split("/").at(-1);
-    const url = req.url;
+server.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header(
+     'Access-Control-Allow-Headers',
+     'Origin, X-Requested-With, Content-Type, Accept'
+  );
+  res.header(
+     'Access-Control-Allow-Methods',
+     'GET, POST, OPTIONS, PUT, DELETE'
+  );
+  next();
+});
 
-    if (url.includes("/rickandmorty/character")) {
-      id = Number(url.split("/").pop());
+// Middleware para parsear el cuerpo de la solicitud en formato JSON
+server.use(express.json());
 
-      // spliteamos separando desde las barras y hacemos at -1 para quedarnos con el ultimo valor q es el ID
-      getCharById(res, id);
-    }
-  })
-  .listen(PORT, "localhost");
-
-//el req(request) nos permite crear rutas en nuetro srvidor
-
-// getCharById.js es un controlador (los controladores son funciones que se encargan de la parte logica de la ruta y de dar la respuesta en base a la logica que trabajo)
-//si vamos al aarchivo getCharById.js vamos a ver q el controlador es el q se encarga de hacerle la peticion a la api, quien se encarga de quedarse con los datos y dar la respeusta final
+// Middleware para agregar el string "/rickandmorty" antes de cada ruta
+server.use('/rickandmorty', mainRouter);

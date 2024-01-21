@@ -14,7 +14,7 @@ const Card = ({
   image,
   onClose,
 }) => {
-  const dispatch = useDispatch(); // es un hook q me permite despachar las ation
+  const dispatch = useDispatch(); // es un hook q me permite despachar las action
 
   const myFavorites = useSelector((state) => state.myFavorites); // nos permite seleccionar algo del estado global
 
@@ -41,7 +41,7 @@ const Card = ({
   }, [myFavorites]); // puede estar aca el error (cuando entro a un detalle se me borran los favoritos)
 
   return (
-    <div>
+    <div className="container">
       {isFav ? (
         <button onClick={handleFavorite}>❤️</button>
       ) : (

@@ -1,26 +1,22 @@
 import Card from "../card/Card";
 
-const Cards = ({ characters, onClose }) => {
+const Cards = (props) => {
   return (
-    <div>
-      {characters.map(
-        ({ id, name, status, species, gender, origin, image }) => {
-          return (
-            <Card
-              key={id}
-              id={id}
-              name={name}
-              status={status}
-              species={species}
-              gender={gender}
-              image={image}
-              origin={origin.name}
-              onClose={onClose}
-            />
-          );
-        }
-      )}
-    </div>
+    <div>{
+      props.characters.map((elements) =>(
+         <Card key = {elements.id}
+         id={elements.id}
+         name = {elements.name}
+         status = {elements.status}
+         species = {elements.species}
+         gender = {elements.gender}
+         origin = {elements.origin?.name}
+         image = {elements.image}
+         onClose={props.onClose}
+         />
+
+      ))
+   }</div>
   );
 };
 export default Cards;

@@ -1,4 +1,5 @@
 import { ADD_FAV, FILTER, ORDER, REMOVE_FAV } from "./action-types";
+import axios from "axios";
 
 const initialState = {
   myFavorites: [], // los filtrados
@@ -6,12 +7,9 @@ const initialState = {
 };
 const reducer = (state = initialState, action) => {
   switch (action.type) {
+    // REDUCER | ADD_FAV
     case ADD_FAV:
-      return {
-        ...state,
-        myFavorites: [...state.allCharacters, action.payload],
-        allCharacters: [...state.allCharacters, action.payload],
-      };
+      return { ...state, myFavorites: payload, allCharacters: payload };
 
     case FILTER:
       const filterByGender = [...state.allCharacters].filter((favorite) => {
@@ -32,13 +30,8 @@ const reducer = (state = initialState, action) => {
         myFavorites: favoritesOrdered,
       };
 
-    case REMOVE_FAV:
-      return {
-        ...state,
-        myFavorites: state.myFavorites.filter((fav) => {
-          fav.id != action.payload;
-        }), //filter retorna un nuevo array. le estamos diciendo q nos vamo a quedar con todos los favortitos cuya id sea distinto que al id del payload (SI UNO DE LOS DATOS ES UN ARRAY Y OTRO UN STRING != no tiene q ser estrictamente distint)
-      };
+      case REMOVE_FAV:
+        return { ...state, myFavorites: payload };
 
     default:
       return { ...state };
